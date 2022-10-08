@@ -39,9 +39,10 @@ fn display(input: &str, reference: bool) {
 
     println!("Result:");
 
-    for (rune, count) in &result {
-        for _ in 0..*count {
-            print!("{}", rune.emoji);
+    for (rune, count_indicator) in &result {
+        match count_indicator {
+            Some(indicator) => print!("{}{}", rune.emoji, indicator),
+            None => print!("{}", rune.emoji),
         }
     }
 
@@ -80,7 +81,10 @@ fn build_lexicon<'a>() -> Vec<Rune<'a>> {
 
 /// Performs Kaley encoding on an input string. The result is a list of rune-integer pairs where the integer
 /// indicates how many times it is repeated.
-fn encode<'a>(input: &str, lexicon: &'a Vec<Rune<'a>>) -> Vec<(&'a Rune<'a>, usize)> {
+fn encode<'a>(
+    input: &str,
+    lexicon: &'a Vec<Rune<'a>>,
+) -> Vec<(&'a Rune<'a>, Option<&'static Emoji>)> {
     let mut result = Vec::new();
     let mut input_index = 0;
 
@@ -111,10 +115,32 @@ fn encode<'a>(input: &str, lexicon: &'a Vec<Rune<'a>>) -> Vec<(&'a Rune<'a>, usi
             }
         }
 
-        result.push((best_rune.expect("No sequence available"), longest_run));
+        result.push((
+            best_rune.expect("No sequence available"),
+            run_indicator(longest_run),
+        ));
 
         input_index += longest_run;
     }
 
     result
+}
+
+/// Indicate the how many letters of the emoji's name are counted with the color of a heart. If no heart is
+/// returned, the `None` variant, then only count one.
+///
+/// For humans, the color of the heart is the guide: ROY G BIV. Red means two, orange means three, etc.
+///
+/// These don't need to be removed from the lexicon because their names are all two words (e.g. "red heart").
+fn run_indicator(length: usize) -> Option<&'static Emoji> {
+    match length {
+        1 => None,
+        2 => Some(emojis::get("❤").unwrap()),
+        3 => Some(emojis::get("🧡").unwrap()),
+        4 => Some(emojis::get("💛").unwrap()),
+        5 => Some(emojis::get("💚").unwrap()),
+        6 => Some(emojis::get("💙").unwrap()),
+        7 => Some(emojis::get("💜").unwrap()),
+        _ => Some(emojis::get("🖤").unwrap()),
+    }
 }
