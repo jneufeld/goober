@@ -1,29 +1,77 @@
-use clap::Parser;
 use emojis::Emoji;
 
-#[derive(Parser, Debug)]
-#[clap(name = "ke", about = "Demonstration of Kaley Encoding", long_about = None)]
+const HELP: &str = "\
+ke: a demonstration of Kaley Encoding
+
+USAGE:
+  ke [-h] [-r] -i WORD
+
+ARGS:
+  -h, --help        Prints this message
+  -r, --reference   (Optional) prints the name of each emoji used in the solution as a reference
+  -i, --input       (Required) the WORD to be encoded (must be a single, non-whitespace-separated word)
+";
+
+/// Arguments passed on the command line
+///
+/// NB the documentation for each field should match the `HELP` string. I'm not
+/// sure if or how to keep those two in sync.
 struct Args {
-    /// Prints the name (i.e. characters) of each emoji used in the solution as a reference
-    #[clap(long, action)]
-    reference: bool,
+    /// Prints the name of each emoji used in the solution as a reference
+    reference: Option<bool>,
 
     /// The word to be encoded (must be a single, non-whitespace-separated word)
-    #[clap(short, long, value_parser)]
     input: String,
 }
 
 fn main() {
-    let args = Args::parse();
+    let args = args_or_quit();
 
     let input = args.input.to_ascii_lowercase();
-    let reference = args.reference;
+    let reference = args.reference.unwrap_or_default();
 
-    display(&input, reference);
+    output(&input, reference);
+}
+
+/// Parses and verifies CLI arguments. If the values can't be used to correctly
+/// execute the program then a help string is displayed along with a possibly
+/// helpful hint. When this function returns, the args are ready for use.
+fn args_or_quit() -> Args {
+    match parse_args() {
+        Err(why) => {
+            // The macro's implicit newline and the argument's explicit newline
+            // are deliberate. It looks better in a terminal when there's a
+            // full line between the specific error and the help message.
+            eprintln!("Error: {}\n", why);
+            print!("{}", HELP);
+            std::process::exit(1);
+        }
+        Ok(args) => args,
+    }
+}
+
+/// Performs low-level parsing of CLI arguments and returns the result. If
+/// arguments are missing or ill-formed then an error is returned. These
+/// verifications are low-level in the sense that they are syntactically
+/// well-formed (i.e. input is present) or an error indicates why they can't be
+/// used for further processing.
+fn parse_args() -> Result<Args, pico_args::Error> {
+    let mut args = pico_args::Arguments::from_env();
+
+    if args.contains(["-h", "--help"]) {
+        return Err(pico_args::Error::MissingArgument);
+    }
+
+    let args = Args {
+        reference: args.opt_value_from_str(["-r", "--reference"])?,
+        input: args.value_from_str(["-i", "--input"])?,
+    };
+
+    Ok(args)
 }
 
 /// Prints the result and optional reference to the terminal
-fn display(input: &str, reference: bool) {
+fn output(input: &str, reference: bool) {
     let lexicon = build_lexicon();
     let result = encode(input, &lexicon);
 
