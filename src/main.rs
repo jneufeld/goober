@@ -1,10 +1,10 @@
 use emojis::Emoji;
 
 const HELP: &str = "\
-ke: a demonstration of Kaley Encoding
+goober: a demonstration of Kaley Encoding
 
 USAGE:
-  ke [-h] [-r] -i WORD
+  goober [-h] [-r] -i WORD
 
 ARGS:
   -h, --help        Prints this message

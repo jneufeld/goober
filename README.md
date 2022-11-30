@@ -1,4 +1,4 @@
-# Kaley Encoding
+# goober
 
 My sister posed a game involving emojis. Given a word, represent it with emojis without using the emoji that directly indicates the word (i.e. the solution for "cat" can't be "🐈").
 
@@ -19,7 +19,7 @@ Emojis have a name (e.g. "🐕" is "cat" and "🐕" is "dog"). My solution is gr
 Hopefully examples yield a better explanation:
 
 ```
-$ ke --reference -i cat
+$ goober --reference -i cat
 Reference:
 🌵 cactus 
 🦖 t-rex  
@@ -33,7 +33,7 @@ The encoding for "cat" is a cactus emoji followed by a red heart and a t-rex. Th
 This works for nonsensical inputs (some emojis appear wide on some systems):
 
 ```
-$ ke --reference -i asdf
+$ goober --reference -i asdf
 Reference:     
 🧑‍🚀 astronaut
 🗡️ dagger      
@@ -46,7 +46,7 @@ Result:
 As well as more complex inputs:
 
 ```
-$ ke --reference -i supercalifragilisticexpialidocious
+$ goober --reference -i supercalifragilisticexpialidocious
 Reference: 
 🦸 superhero
 📅 calendar
@@ -73,7 +73,7 @@ Result:
 But if an emoji can't be found for even a single character, the program will fail:
 
 ```
-$ ke --reference -i asdfqwerty
+$ goober --reference -i asdfqwerty
 panicked at 'No sequence available'
 ```
 

@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "ke"
+name = "goober"
 version = "0.1.0"
 dependencies = [
  "emojis",
